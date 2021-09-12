@@ -9,3 +9,41 @@ datasource db {
 generator client {
   provider = "prisma-client-js"
 }
+
+model File {
+  id          String        @id @default(uuid())
+  name        String
+  directory   Directory     @relation(fields: [directoryId], references: [id])
+  directoryId String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  versions    FileVersion[]
+
+  @@map("files")
+}
+
+model FileVersion {
+  id        String   @id @default(uuid())
+  name      String
+  mimeType  String
+  size      Int
+  file      File     @relation(fields: [fileId], references: [id])
+  fileId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("file_versions")
+}
+
+model Directory {
+  id          String      @id @default(uuid())
+  name        String
+  parent      Directory?  @relation(fields: [parentId], references: [id])
+  parentId    String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  files       File[]
+  directories Directory[] @relation("DirectoryToDirectory")
+
+  @@map("directories")
+}
