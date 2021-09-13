@@ -69,6 +69,18 @@ export async function downloadLocalFile(
   return await getObject(key)
 }
 
+export async function uploadLocalFile(
+  signedUrl: string,
+  file: FakeAwsFile
+): Promise<void> {
+  const key = validateSignedUrl("put", signedUrl)
+  await saveFile(key, {
+    ContentLength: file.Body.byteLength,
+    LastModified: new Date(),
+    ...file,
+  })
+}
+
 async function getObject(key: string): Promise<FakeAwsFile> {
   const rest = await headObject(key)
   const Body = await fs.readFile(getPath(key))
