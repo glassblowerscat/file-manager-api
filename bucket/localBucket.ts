@@ -61,3 +61,62 @@ async function deleteObject(key: string) {
   await fs.unlink(getPath(key))
   await fs.unlink(getPath(key) + ".info")
 }
+
+export async function downloadLocalFile(
+  signedUrl: string
+): Promise<FakeAwsFile> {
+  const key = validateSignedUrl("get", signedUrl)
+  return await getObject(key)
+}
+
+async function getObject(key: string): Promise<FakeAwsFile> {
+  const rest = await headObject(key)
+  const Body = await fs.readFile(getPath(key))
+  return { ...rest, Body }
+}
+
+async function headObject(key: string): Promise<FakeAwsFile> {
+  const path = getPath(key)
+  try {
+    await fs.stat(path)
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    }
+  }
+  const raw = await fs.readFile(path + ".info")
+  const parsedInfo = JSON.parse(raw.toString()) as FakeAwsFile
+  const info = {
+    ...parsedInfo,
+    ...(parsedInfo.LastModified
+      ? { LastModified: new Date(parsedInfo.LastModified) }
+      : {}),
+  }
+  return info
+}
+
+// localhost:4000?signed=%7B%22operation%22%3A%22putObject%22%2C%22key%22%3A%221D8aLzfWEqt%22%2C%22expires%22%3A1630210807938%7D
+function validateSignedUrl(operation: "get" | "put", url: string) {
+  const searchParams = new URL(url).searchParams
+  const rawSigned = searchParams.get("signed") ?? url
+  try {
+    const signed = JSON.parse(rawSigned) as {
+      operation: string
+      key: string
+      expires: number
+    }
+    if (signed.operation !== operation) {
+      throw new Error("Incorrect operation")
+    }
+    if (DateTime.local() > DateTime.fromMillis(signed.expires)) {
+      throw new Error("URL expired")
+    }
+    return signed.key
+  } catch (error) {
+    if (error instanceof Error) {
+      throw error
+    } else {
+      throw new Error("Could not validate URL")
+    }
+  }
+}

@@ -4,6 +4,7 @@ import { Directory, File, FileVersion } from "@prisma/client"
 import express from "express"
 import { graphqlHTTP } from "express-graphql"
 import { createApplication, createModule, gql } from "graphql-modules"
+import { downloadLocalFile } from "./bucket"
 import { directoryModule } from "./directory"
 import { fileModule } from "./file"
 import { fileVersionModule } from "./fileVersion"
@@ -52,6 +53,19 @@ const api = createApplication({
 })
 
 const app = express()
+
+app.get("/file", function (req, res) {
+  void downloadLocalFile(
+    `${req.protocol}://${req.get("host") ?? ""}${req.originalUrl}`
+  )
+    .then((file) => {
+      res.setHeader("Content-Type", file.ContentType)
+      res.status(200).send(file.Body)
+    })
+    .catch((error) => {
+      res.status(400).send(error)
+    })
+})
 
 app.use(
   "/graphql",
