@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "db:seed": "NODE_ENV=development npx prisma db seed",
+    "db:reset": "rm -rf ./.files && NODE_ENV=development npx prisma migrate reset",
     "dev": "NODE_ENV=development nodemon app.ts",
     "start": "tsc --build && node dist/app.js",
     "start:clean": "rm -rf dist && tsc --build && node dist/app.js",
@@ -12,6 +14,9 @@
     "type-check": "tsc -p .",
     "build": "tsc --build",
     "build:clean": "rm -rf dist && tsc --build"
+  },
+  "prisma": {
+    "seed": "ts-node seed.ts"
   },
   "author": "",
   "license": "ISC",
