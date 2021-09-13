@@ -27,6 +27,7 @@ model FileVersion {
   name      String
   mimeType  String
   size      Int
+  key       String
   file      File     @relation(fields: [fileId], references: [id])
   fileId    String
   createdAt DateTime @default(now())
