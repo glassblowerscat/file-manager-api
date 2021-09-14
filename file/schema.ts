@@ -35,6 +35,9 @@ export const fileModule = createModule({
 
       extend type Mutation {
         createFile(input: CreateFileInput!): CreateFileResult!
+        moveFile(id: ID!, directoryId: ID!): File!
+        renameFile(id: ID!, name: String!): File!
+        deleteFile(id: ID!): Boolean!
       }
     `,
   ],
@@ -50,6 +53,27 @@ export const fileModule = createModule({
         { input }: { input: fileService.CreateFileInput }
       ): Promise<{ file: File; url: string }> => {
         return await fileService.createFileRecord(prismaClient(), input)
+      },
+      moveFile: async (
+        _: unknown,
+        {
+          id,
+          directoryId,
+        }: { id: File["id"]; directoryId: File["directoryId"] }
+      ): Promise<File> => {
+        return await fileService.moveFile(prismaClient(), id, directoryId)
+      },
+      renameFile: async (
+        _: unknown,
+        { id, name }: { id: File["id"]; name: File["name"] }
+      ): Promise<File> => {
+        return await fileService.renameFile(prismaClient(), id, name)
+      },
+      deleteFile: async (
+        _: unknown,
+        { id }: { id: File["id"] }
+      ): Promise<boolean> => {
+        return await fileService.deleteFile(prismaClient(), id)
       },
     },
   },
