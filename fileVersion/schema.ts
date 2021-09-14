@@ -54,6 +54,8 @@ export const fileVersionModule = createModule({
         createFileVersion(
           input: CreateFileVersionInput!
         ): CreateFileVersionResult!
+        renameFileVersion(id: ID!, name: String!): FileVersion!
+        deleteFileVersion(id: ID!): Boolean!
       }
     `,
   ],
@@ -88,6 +90,22 @@ export const fileVersionModule = createModule({
           prismaClient(),
           input
         )
+      },
+      renameFileVersion: async (
+        _: unknown,
+        { id, name }: { id: FileVersion["id"]; name: FileVersion["name"] }
+      ) => {
+        return await fileVersionService.renameFileVersion(
+          prismaClient(),
+          id,
+          name
+        )
+      },
+      deleteFileVersion: async (
+        _: unknown,
+        { id }: { id: FileVersion["id"] }
+      ) => {
+        return await fileVersionService.deleteFileVersion(prismaClient(), id)
       },
     },
   },
