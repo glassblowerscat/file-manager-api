@@ -25,6 +25,7 @@ const mainModule = createModule({
         name: String!
         createdAt: String!
         updatedAt: String!
+        deletedAt: String
       }
 
       input PaginationInput {

@@ -18,6 +18,7 @@ export const fileVersionModule = createModule({
         key: String!
         createdAt: String!
         updatedAt: String!
+        deletedAt: String
         versions: [FileVersion]!
       }
 
@@ -37,6 +38,7 @@ export const fileVersionModule = createModule({
         key: String!
         createdAt: String!
         updatedAt: String!
+        deletedAt: String
         url: String!
       }
 

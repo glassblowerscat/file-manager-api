@@ -70,7 +70,7 @@ export async function getFileVersions(
           take: pagination.pageLength,
         }
       : {}),
-    where: { fileId },
+    where: { fileId, deletedAt: null },
   })
 }
 
