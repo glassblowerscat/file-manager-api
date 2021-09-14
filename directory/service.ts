@@ -60,3 +60,17 @@ export async function deleteDirectory(
   await client.directory.delete({ where: { id } })
   return true
 }
+export async function findDirectories(
+  client: PrismaClient,
+  query: string
+): Promise<Directory[]> {
+  return await client.directory.findMany({
+    where: {
+      name: {
+        contains: query,
+        mode: "insensitive",
+      },
+    },
+    orderBy: [{ name: "asc" }],
+  })
+}

@@ -89,3 +89,19 @@ export async function deleteFile(
   }
   return true
 }
+
+export async function findFiles(
+  client: PrismaClient,
+  query: string
+): Promise<File[]> {
+  return await client.file.findMany({
+    where: {
+      name: {
+        contains: query,
+        mode: "insensitive",
+      },
+    },
+    orderBy: [{ name: "asc" }],
+    include: { versions: true },
+  })
+}
