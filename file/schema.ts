@@ -47,7 +47,10 @@ export const fileModule = createModule({
       getAllFiles: () => {
         return prismaClient().file.findMany()
       },
-      getFile: async (_: unknown, { id }: { id: File["id"] }) => {
+      getFile: async (
+        _: unknown,
+        { id }: { id: File["id"] }
+      ): Promise<File | null> => {
         return await fileService.getFile(prismaClient(), id)
       },
     },
