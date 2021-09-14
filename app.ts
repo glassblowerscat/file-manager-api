@@ -9,6 +9,11 @@ import { directoryModule } from "./directory"
 import { fileModule } from "./file"
 import { fileVersionModule } from "./fileVersion"
 
+export interface Pagination {
+  pageLength: number
+  page: number
+}
+
 const mainModule = createModule({
   id: "main-module",
   dirname: __dirname,
@@ -19,6 +24,11 @@ const mainModule = createModule({
         name: String!
         createdAt: String!
         updatedAt: String!
+      }
+
+      input PaginationInput {
+        pageLength: Int!
+        page: Int!
       }
 
       type Query {

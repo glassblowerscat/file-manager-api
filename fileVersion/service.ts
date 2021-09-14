@@ -1,4 +1,5 @@
-import { FileVersion, Prisma, PrismaClient } from "@prisma/client"
+import { File, FileVersion, Prisma, PrismaClient } from "@prisma/client"
+import { Pagination } from "../app"
 import { getBucket } from "../bucket"
 import { generateId } from "../util/generators"
 
@@ -48,4 +49,27 @@ export async function createFileVersionRecord(
     await client.fileVersion.delete({ where: { id: version.id } })
     throw new Error("Could not instantiate file bucket")
   }
+}
+
+export async function getFileVersion(
+  client: PrismaClient,
+  id: FileVersion["id"]
+): Promise<FileVersion | null> {
+  return await client.fileVersion.findUnique({ where: { id } })
+}
+
+export async function getFileVersions(
+  client: PrismaClient,
+  fileId: File["id"],
+  pagination?: Pagination
+): Promise<FileVersion[]> {
+  return await client.fileVersion.findMany({
+    ...(pagination
+      ? {
+          skip: (pagination.page - 1) * pagination.pageLength,
+          take: pagination.pageLength,
+        }
+      : {}),
+    where: { fileId },
+  })
 }
