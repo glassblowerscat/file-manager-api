@@ -10,6 +10,36 @@ const fileInputFields = Prisma.validator<Prisma.FileArgs>()({
 export type CreateFileInput = Prisma.FileGetPayload<typeof fileInputFields> &
   Omit<CreateFileVersionInput, "fileId" | "key"> & { key?: FileVersion["key"] }
 
+export async function updateFileHistory(
+  client: PrismaClient,
+  id: File["id"],
+  entry: Record<string, string | number | boolean>
+): Promise<Prisma.JsonArray> {
+  const file = await client.file.findUnique({
+    where: { id },
+    select: { history: true },
+  })
+
+  if (!file) {
+    throw new Error("File not found")
+  }
+
+  const history =
+    file.history &&
+    typeof file.history === "object" &&
+    Array.isArray(file.history)
+      ? file.history
+      : []
+  const updatedHistory = [
+    ...history,
+    {
+      ...entry,
+      date: new Date().toString(),
+    },
+  ]
+  return updatedHistory
+}
+
 export async function createFileRecord(
   client: PrismaClient,
   file: CreateFileInput
@@ -26,6 +56,15 @@ export async function createFileRecord(
     name,
     directoryId,
     ancestors: [...ancestors, directoryId],
+    history: [
+      {
+        action: "created",
+        name,
+        mimeType,
+        size,
+        directoryId,
+      },
+    ],
     versions: {
       create: {
         name,
