@@ -105,11 +105,15 @@ export async function moveFile(
     throw new Error("Invalid target Directory")
   }
   const { ancestors } = directory
+  const updatedHistory = await updateFileHistory(client, id, {
+    directory: directory.id,
+  })
   return await client.file.update({
     where: { id },
     data: {
       directoryId,
       ancestors: [...ancestors, directoryId],
+      history: updatedHistory,
     },
     include: { versions: true },
   })
@@ -120,9 +124,10 @@ export async function renameFile(
   id: File["id"],
   name: File["name"]
 ): Promise<File> {
+  const updatedHistory = await updateFileHistory(client, id, { name })
   return await client.file.update({
     where: { id },
-    data: { name },
+    data: { name, history: updatedHistory },
     include: { versions: true },
   })
 }
@@ -131,10 +136,9 @@ export async function deleteFile(
   client: PrismaClient,
   id: File["id"]
 ): Promise<boolean> {
-  // const fileVersions = await client.file
-  //   .findUnique({ where: { id } })
-  //   .versions()
+  const updatedHistory = await updateFileHistory(client, id, { deleted: true })
   await client.$transaction([
+    client.file.update({ where: { id }, data: { history: updatedHistory } }),
     client.fileVersion.deleteMany({ where: { fileId: id } }),
     client.file.delete({ where: { id } }),
   ])
