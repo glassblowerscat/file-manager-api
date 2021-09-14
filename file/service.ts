@@ -16,9 +16,16 @@ export async function createFileRecord(
 ): Promise<{ file: File; url: string }> {
   const { name, directoryId, mimeType, size, key: keyInput } = file
   const key = keyInput ?? (await generateId())
+
+  const directory = await client.directory.findUnique({
+    where: { id: directoryId },
+  })
+  const ancestors = directory?.ancestors ?? []
+
   const data = {
     name,
     directoryId,
+    ancestors: [...ancestors, directoryId],
     versions: {
       create: {
         name,
