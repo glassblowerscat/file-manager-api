@@ -13,8 +13,10 @@ export const fileModule = createModule({
         name: String!
         directoryId: ID!
         ancestors: [String]!
+        history: JSON
         createdAt: String!
         updatedAt: String!
+        deletedAt: String
         versions: [FileVersion]!
       }
 
