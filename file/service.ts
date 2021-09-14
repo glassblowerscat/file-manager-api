@@ -136,6 +136,9 @@ export async function deleteFile(
   client: PrismaClient,
   id: File["id"]
 ): Promise<boolean> {
+  // const fileVersions = await client.file
+  //   .findUnique({ where: { id } })
+  //   .versions()
   const updatedHistory = await updateFileHistory(client, id, { deleted: true })
   await client.$transaction([
     client.file.update({ where: { id }, data: { history: updatedHistory } }),
