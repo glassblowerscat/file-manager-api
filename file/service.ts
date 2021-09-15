@@ -92,16 +92,16 @@ export async function deleteFile(
   client: PrismaClient,
   id: File["id"]
 ): Promise<boolean> {
-  const fileVersions = await client.file
-    .findUnique({ where: { id } })
-    .versions()
+  // const fileVersions = await client.file
+  //   .findUnique({ where: { id } })
+  //   .versions()
   await client.$transaction([
     client.fileVersion.deleteMany({ where: { fileId: id } }),
     client.file.delete({ where: { id } }),
   ])
-  for (const version of fileVersions) {
-    await getBucket().deleteObject(version.key)
-  }
+  // for (const version of fileVersions) {
+  //   await getBucket().deleteObject(version.key)
+  // }
   return true
 }
 
