@@ -31,6 +31,7 @@ export const fileModule = createModule({
 
       extend type Query {
         getAllFiles: [File]!
+        getFile(id: ID!): File
       }
 
       extend type Mutation {
@@ -45,6 +46,9 @@ export const fileModule = createModule({
     Query: {
       getAllFiles: () => {
         return prismaClient().file.findMany()
+      },
+      getFile: async (_: unknown, { id }: { id: File["id"] }) => {
+        return await fileService.getFile(prismaClient(), id)
       },
     },
     Mutation: {
